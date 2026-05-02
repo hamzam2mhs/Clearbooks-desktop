@@ -1,6 +1,30 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { API_BASE_URL } from '../config/env';
 
+export type BackendUser = {
+    cognitoSub: string;
+    email?: string;
+    userId: string;
+    businessId: string;
+};
+
+export type IncomeSummary = {
+    totalIncomeCents: string;
+    totalTaxCollectedCents: string;
+};
+
+export type TaxSummary = {
+    taxCollectedCents: string;
+    taxPaidCents: string;
+    netTaxPayableCents: string;
+};
+
+export type ProfitSummary = {
+    totalIncomeCents: string;
+    totalExpenseCents: string;
+    netProfitCents: string;
+};
+
 async function getAccessToken() {
     const session = await fetchAuthSession();
     const accessToken = session.tokens?.accessToken?.toString();
@@ -12,7 +36,7 @@ async function getAccessToken() {
     return accessToken;
 }
 
-export async function apiGet(path: string) {
+export async function apiGet<T>(path: string): Promise<T> {
     const accessToken = await getAccessToken();
 
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -48,6 +72,18 @@ export async function getDbHealth() {
     return response.json();
 }
 
-export async function getCurrentBackendUser() {
-    return apiGet('/api/me');
+export function getCurrentBackendUser() {
+    return apiGet<BackendUser>('/api/me');
+}
+
+export function getIncomeSummary() {
+    return apiGet<IncomeSummary>('/api/summary/income');
+}
+
+export function getTaxSummary() {
+    return apiGet<TaxSummary>('/api/summary/tax');
+}
+
+export function getProfitSummary() {
+    return apiGet<ProfitSummary>('/api/summary/profit');
 }
