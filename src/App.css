@@ -419,3 +419,13 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+.badge-locked {
+  background: #eef2f7;
+  color: #475569;
+}
+
+.badge-unlocked {
+  background: #e8f7ef;
+  color: #157347;
+}

@@ -64,6 +64,16 @@ export type CreateOpeningSnapshotPayload = {
     taxPayableCents: number;
 };
 
+export type ReportingPeriod = {
+    id: string;
+    businessId: string;
+    startDate: string;
+    endDate: string;
+    type: string;
+    locked: boolean;
+    createdAt: string;
+};
+
 async function getAccessToken() {
     const session = await fetchAuthSession();
     const accessToken = session.tokens?.accessToken?.toString();
@@ -110,6 +120,12 @@ export async function apiPost<T, TBody>(path: string, body: TBody): Promise<T> {
     return apiRequest<T>(path, {
         method: 'POST',
         body: JSON.stringify(body),
+    });
+}
+
+export async function apiPatch<T>(path: string): Promise<T> {
+    return apiRequest<T>(path, {
+        method: 'PATCH',
     });
 }
 
@@ -176,4 +192,12 @@ export function createOpeningSnapshot(payload: CreateOpeningSnapshotPayload) {
         '/api/opening-snapshot',
         payload
     );
+}
+
+export function getReportingPeriods() {
+    return apiGet<ReportingPeriod[]>('/api/periods');
+}
+
+export function lockReportingPeriod(id: string) {
+    return apiPatch<ReportingPeriod>(`/api/periods/${id}/lock`);
 }
