@@ -1,38 +1,70 @@
 import { useState } from 'react';
+import { Authenticator } from '@aws-amplify/ui-react';
+import { getCurrentBackendUser, getDbHealth, getHealth } from './lib/api';
 import './App.css';
-import { getDbHealth, getHealth } from './lib/api';
 
 function App() {
-  const [result, setResult] = useState<string>('No request yet');
-  const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState<string>('No request yet');
+    const [loading, setLoading] = useState(false);
 
-  async function testBackend() {
-    try {
-      setLoading(true);
+    async function testBackendHealth() {
+        try {
+            setLoading(true);
 
-      const health = await getHealth();
-      const dbHealth = await getDbHealth();
+            const health = await getHealth();
+            const dbHealth = await getDbHealth();
 
-      setResult(JSON.stringify({ health, dbHealth }, null, 2));
-    } catch (error) {
-      setResult(error instanceof Error ? error.message : 'Unknown error');
-    } finally {
-      setLoading(false);
+            setResult(JSON.stringify({ health, dbHealth }, null, 2));
+        } catch (error) {
+            setResult(error instanceof Error ? error.message : 'Unknown error');
+        } finally {
+            setLoading(false);
+        }
     }
-  }
 
-  return (
-      <main style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
-        <h1>ClearBooks Desktop</h1>
-        <p>Frontend is running. Test backend connection below.</p>
+    async function testAuthenticatedUser() {
+        try {
+            setLoading(true);
 
-        <button onClick={testBackend} disabled={loading}>
-          {loading ? 'Testing...' : 'Test Backend Connection'}
-        </button>
+            const user = await getCurrentBackendUser();
 
-        <pre style={{ marginTop: '1rem' }}>{result}</pre>
-      </main>
-  );
+            setResult(JSON.stringify(user, null, 2));
+        } catch (error) {
+            setResult(error instanceof Error ? error.message : 'Unknown error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <Authenticator loginMechanisms={['email']}>
+            {({ signOut, user }) => (
+                <main style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
+                    <h1>ClearBooks Desktop</h1>
+
+                    <p>
+                        Signed in as: <strong>{user?.signInDetails?.loginId}</strong>
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                        <button onClick={testBackendHealth} disabled={loading}>
+                            Test Backend Health
+                        </button>
+
+                        <button onClick={testAuthenticatedUser} disabled={loading}>
+                            Test /api/me
+                        </button>
+
+                        <button onClick={signOut}>
+                            Sign out
+                        </button>
+                    </div>
+
+                    <pre>{result}</pre>
+                </main>
+            )}
+        </Authenticator>
+    );
 }
 
 export default App;
