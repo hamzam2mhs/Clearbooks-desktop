@@ -25,6 +25,45 @@ export type ProfitSummary = {
     netProfitCents: string;
 };
 
+export type Transaction = {
+    id: string;
+    businessId: string;
+    type: 'INCOME' | 'EXPENSE';
+    amountCents: string;
+    taxCents: string;
+    category: string;
+    occurredAt: string;
+    createdAt: string;
+};
+
+export type CreateTransactionPayload = {
+    amountCents: number;
+    taxCents: number;
+    category: string;
+    occurredAt: string;
+};
+
+export type OpeningSnapshot = {
+    id: string;
+    businessId: string;
+    effectiveDate: string;
+    cashCents: string;
+    receivablesCents: string;
+    payablesCents: string;
+    taxPayableCents: string;
+    declaredByUser: boolean;
+    locked: boolean;
+    createdAt: string;
+};
+
+export type CreateOpeningSnapshotPayload = {
+    effectiveDate: string;
+    cashCents: number;
+    receivablesCents: number;
+    payablesCents: number;
+    taxPayableCents: number;
+};
+
 async function getAccessToken() {
     const session = await fetchAuthSession();
     const accessToken = session.tokens?.accessToken?.toString();
@@ -36,20 +75,42 @@ async function getAccessToken() {
     return accessToken;
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
     const accessToken = await getAccessToken();
 
     const response = await fetch(`${API_BASE_URL}${path}`, {
+        ...options,
         headers: {
             Authorization: `Bearer ${accessToken}`,
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            ...options.headers,
         },
     });
 
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : null;
+
     if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        const message =
+            data?.message ||
+            data?.error ||
+            `API request failed: ${response.status}`;
+
+        throw new Error(message);
     }
 
-    return response.json();
+    return data as T;
+}
+
+export async function apiGet<T>(path: string): Promise<T> {
+    return apiRequest<T>(path);
+}
+
+export async function apiPost<T, TBody>(path: string, body: TBody): Promise<T> {
+    return apiRequest<T>(path, {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
 }
 
 export async function getHealth() {
@@ -86,4 +147,33 @@ export function getTaxSummary() {
 
 export function getProfitSummary() {
     return apiGet<ProfitSummary>('/api/summary/profit');
+}
+
+export function getTransactions() {
+    return apiGet<Transaction[]>('/api/transactions');
+}
+
+export function createIncomeTransaction(payload: CreateTransactionPayload) {
+    return apiPost<Transaction, CreateTransactionPayload>(
+        '/api/transactions/income',
+        payload
+    );
+}
+
+export function createExpenseTransaction(payload: CreateTransactionPayload) {
+    return apiPost<Transaction, CreateTransactionPayload>(
+        '/api/transactions/expense',
+        payload
+    );
+}
+
+export function getOpeningSnapshot() {
+    return apiGet<OpeningSnapshot | null>('/api/opening-snapshot');
+}
+
+export function createOpeningSnapshot(payload: CreateOpeningSnapshotPayload) {
+    return apiPost<OpeningSnapshot, CreateOpeningSnapshotPayload>(
+        '/api/opening-snapshot',
+        payload
+    );
 }

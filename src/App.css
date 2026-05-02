@@ -285,3 +285,137 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 0.4rem;
+  color: #52657a;
+  font-weight: 700;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  border: 1px solid #d7dee8;
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+  color: #102033;
+  background: white;
+  font: inherit;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  outline: 3px solid rgba(18, 53, 91, 0.14);
+  border-color: #12355b;
+}
+
+.success-text {
+  color: #157347;
+  font-weight: 700;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.85rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table th {
+  color: #52657a;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.badge-income {
+  background: #e8f7ef;
+  color: #157347;
+}
+
+.badge-expense {
+  background: #fff2e5;
+  color: #a15c00;
+}
+
+@media (max-width: 1000px) {
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.snapshot-grid div {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.snapshot-grid dt {
+  color: #52657a;
+  font-weight: 800;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.snapshot-grid dd {
+  margin: 0;
+  color: #102033;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1000px) {
+  .snapshot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+}
